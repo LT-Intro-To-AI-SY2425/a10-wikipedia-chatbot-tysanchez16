@@ -111,10 +111,32 @@ def get_birth_date(name: str) -> str:
 
     return match.group("birth")
 
+def get_war_date(name: str) -> str:
+    infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    print(infobox_text)
+    pattern = r"(?:Date\D*)(?P<start>\d{1,2} \w+ \d{4})"
+    error_text = (
+        "Page infobox has no war start date"
+    )
+    match = get_match(infobox_text, pattern, error_text)
+
+    return match.group("birth")
+
 
 # below are a set of actions. Each takes a list argument and returns a list of answers
 # according to the action and the argument. It is important that each function returns a
 # list of the answer(s) and not just the answer itself.
+def war_date(matches: List[str]) -> List[str]:
+    """Returns birth date of named person in matches
+
+    Args:
+        matches - match from pattern of person's name to find birth date of
+
+    Returns:
+        birth date of named person
+    """
+    return [get_war_date(" ".join(matches))]
+
 
 
 def birth_date(matches: List[str]) -> List[str]:
@@ -156,6 +178,8 @@ Action = Callable[[List[str]], List[Any]]
 pa_list: List[Tuple[Pattern, Action]] = [
     ("when was % born".split(), birth_date),
     ("what is the polar radius of %".split(), polar_radius),
+    ("when did % start".split(), war_date),
+
     (["bye"], bye_action),
 ]
 
@@ -184,7 +208,7 @@ def search_pa_list(src: List[str]) -> List[str]:
 def query_loop() -> None:
     """The simple query loop. The try/except structure is to catch Ctrl-C or Ctrl-D
     characters and exit gracefully"""
-    print("Welcome to the movie database!\n")
+    print("Welcome to the wikipedia database!\n")
     while True:
         try:
             print()
