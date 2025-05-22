@@ -119,8 +119,17 @@ def get_war_date(name: str) -> str:
     )
     match = get_match(infobox_text, pattern, error_text)
 
-    return match.group("birth")
+    return match.group("start")
 
+def get_food_origin(name: str) -> str:
+    infobox_text = clean_text(get_first_infobox_text(get_page_html(name)))
+    pattern = r"(?<=Place of origin)(?P<origin>[A-Z][a-z]+)"
+    error_text = (
+        "Page infobox has no place of origin information"
+    )
+    match = get_match(infobox_text, pattern, error_text)
+
+    return match.group("origin")
 
 def get_country_capital(country_name: str) -> str:
     """Gets the capital city of the given country
@@ -138,6 +147,8 @@ def get_country_capital(country_name: str) -> str:
 
     return match.group("capital").strip()
 
+
+
 # below are a set of actions. Each takes a list argument and returns a list of answers
 # according to the action and the argument. It is important that each function returns a
 # list of the answer(s) and not just the answer itself.
@@ -151,17 +162,6 @@ def war_date(matches: List[str]) -> List[str]:
         birth date of named person
     """
     return [get_war_date(" ".join(matches))]
-
-def country_capital(matches: List[str]) -> List[str]:
-    """Returns birth date of named person in matches
-
-    Args:
-        matches - match from pattern of person's name to find birth date of
-
-    Returns:
-        birth date of named person
-    """
-    return [get_country_capital(" ".join(matches))]
 
 def birth_date(matches: List[str]) -> List[str]:
     """Returns birth date of named person in matches
@@ -186,6 +186,20 @@ def polar_radius(matches: List[str]) -> List[str]:
     """
     return [get_polar_radius(matches[0])]
 
+def food_origin(matches: List[str]) -> List[str]:
+    return [get_food_origin(" ".join(matches))]
+
+def country_capital(matches: List[str]) -> List[str]:
+    """Returns birth date of named person in matches
+
+    Args:
+        matches - match from pattern of person's name to find birth date of
+
+    Returns:
+        birth date of named person
+    """
+    return [get_country_capital(" ".join(matches))]
+
 
 # dummy argument is ignored and doesn't matter
 def bye_action(dummy: List[str]) -> None:
@@ -203,7 +217,9 @@ pa_list: List[Tuple[Pattern, Action]] = [
     ("when was % born".split(), birth_date),
     ("what is the polar radius of %".split(), polar_radius),
     ("when did % start".split(), war_date),
+    ("where did % originate".split(), food_origin),
     ("what is the capital of %".split(), country_capital),
+
 
     (["bye"], bye_action),
 ]
@@ -233,7 +249,7 @@ def search_pa_list(src: List[str]) -> List[str]:
 def query_loop() -> None:
     """The simple query loop. The try/except structure is to catch Ctrl-C or Ctrl-D
     characters and exit gracefully"""
-    print("Welcome to the wikipedia database!\n")
+    print("Welcome to the movie database!\n")
     while True:
         try:
             print()
